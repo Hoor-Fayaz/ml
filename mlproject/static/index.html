@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WildAI - Intelligent Wildlife Scanner</title>
+  <meta name="description" content="Identify 64 animal classes in real-time using deep learning models on your iPhone device mockup.">
+  
+  <!-- Google Fonts: Outfit for titles, Inter for body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Link -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Main container mapping to screen/desktop layout -->
+  <div class="app-container" id="appContainer">
+    
+    <!-- iPhone 15 Pro Physical Mockup Frame -->
+    <div class="iphone-frame" id="iphoneFrame">
+      
+      <!-- Bezel & Physical Hardware items -->
+      <div class="side-button volume-up"></div>
+      <div class="side-button volume-down"></div>
+      <div class="side-button power-button"></div>
+      
+      <!-- Internal Screen -->
+      <div class="iphone-screen" id="iphoneScreen">
+        
+        <!-- iPhone Status Bar -->
+        <div class="iphone-status-bar" id="statusBar">
+          <div class="status-time" id="statusTime">09:41</div>
+          <div class="status-icons">
+            <!-- Signal Strength -->
+            <svg class="status-icon" viewBox="0 0 24 24" width="16" height="16">
+              <path d="M2 18h2v-2H2v2zm4 0h2v-5H6v5zm4 0h2v-8h-2v8zm4 0h2V7h-2v11zm4 0h2V3h-2v15z" fill="currentColor"/>
+            </svg>
+            <!-- Wifi -->
+            <svg class="status-icon" viewBox="0 0 24 24" width="16" height="16">
+              <path d="M12 21a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm-6.36-6.36a9 9 0 0 1 12.72 0 1.5 1.5 0 1 0 2.12-2.12c-4.69-4.69-12.28-4.69-16.97 0a1.5 1.5 0 0 0 2.13 2.12zM2.5 9.68a14 14 0 0 1 19 0 1.5 1.5 0 1 0 2.12-2.12 17 17 0 0 0-23.24 0 1.5 1.5 0 1 0 2.12 2.12z" fill="currentColor"/>
+            </svg>
+            <!-- Battery -->
+            <div class="status-battery">
+              <div class="battery-level"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Island (Interacts on scanner action or backend notifications) -->
+        <div class="dynamic-island-container" id="dynamicIslandContainer">
+          <div class="dynamic-island" id="dynamicIsland">
+            <span class="island-pulse" id="islandPulse"></span>
+            <span class="island-text" id="islandText">WildAI</span>
+          </div>
+        </div>
+
+        <!-- ==============================================
+             1. SPLASH SCREEN (Welcome / Get Started)
+             ============================================== -->
+        <div class="screen-view active" id="splashScreen">
+          <div class="splash-bg"></div>
+          <div class="splash-content">
+            <div class="splash-header">
+              <div class="logo-scanner">
+                <svg class="logo-icon animate-pulse" viewBox="0 0 24 24" width="60" height="60">
+                  <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.2.2.45.3.71.3s.51-.1.71-.3l1.79-1.79C9.1 19.8 10.5 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm-2-8c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1zm4 0c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1z" fill="url(#logoGrad)"/>
+                  <defs>
+                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#4E65FF" />
+                      <stop offset="100%" stop-color="#92EFFD" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <h1 class="splash-title">Wild<span>AI</span></h1>
+              <p class="splash-subtitle">Intelligent Wildlife Identifier</p>
+            </div>
+            
+            <div class="splash-body">
+              <div class="feature-row">
+                <div class="feature-icon">🔍</div>
+                <div class="feature-text">
+                  <h3>64 Animal Classes</h3>
+                  <p>Identify mammals, birds, reptiles, aquatic life, and insects instantly.</p>
+                </div>
+              </div>
+              <div class="feature-row">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-text">
+                  <h3>Dual Model Engine</h3>
+                  <p>Compare ResNet50 and MobileNetV2 models side-by-side for accuracy and latency.</p>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" id="btnGetStarted">
+              Get Started
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==============================================
+             2. HOME TAB
+             ============================================== -->
+        <div class="screen-view" id="homeScreen">
+          <div class="screen-header">
+            <div class="user-profile">
+              <div class="profile-avatar">🌱</div>
+              <div class="profile-greeting">
+                <p>Welcome back</p>
+                <h2>Explorer</h2>
+              </div>
+            </div>
+            <div class="notification-badge" id="backendStatusBadge" title="Server Connection Status">
+              <span class="status-dot disconnected" id="statusDot"></span>
+              <span class="status-label" id="statusLabel">Offline</span>
+            </div>
+          </div>
+
+          <div class="search-bar-container">
+            <div class="search-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input type="text" id="animalSearchInput" placeholder="Search 64 animal classes..." autocomplete="off">
+            <div class="search-results-overlay" id="searchResultsOverlay"></div>
+          </div>
+
+          <div class="hero-card" id="heroScanCard">
+            <div class="hero-card-content">
+              <span>SCAN ANY ANIMAL</span>
+              <h2>Start Identification</h2>
+              <p>Point your camera or upload a picture to analyze species details.</p>
+              <button class="btn btn-glass" id="heroScanBtn">Open Scanner</button>
+            </div>
+            <div class="hero-card-graphics"></div>
+          </div>
+
+          <!-- Animal Categories -->
+          <div class="section-container">
+            <div class="section-title-row">
+              <h3>Animal Categories</h3>
+            </div>
+            <div class="categories-grid">
+              <div class="category-card" data-category="Mammals">
+                <div class="cat-icon">🦁</div>
+                <span>Mammals</span>
+              </div>
+              <div class="category-card" data-category="Birds">
+                <div class="cat-icon">🦅</div>
+                <span>Birds</span>
+              </div>
+              <div class="category-card" data-category="Reptiles">
+                <div class="cat-icon">🦎</div>
+                <span>Reptiles</span>
+              </div>
+              <div class="category-card" data-category="Aquatic">
+                <div class="cat-icon">🐋</div>
+                <span>Aquatic</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Discoveries -->
+          <div class="section-container" style="flex: 1; display: flex; flex-direction: column;">
+            <div class="section-title-row">
+              <h3>Recent Discoveries</h3>
+              <a href="#" id="viewAllHistoryLink">View All</a>
+            </div>
+            <div class="recent-list" id="recentDiscoveriesList">
+              <!-- Dynamically populated -->
+              <div class="empty-state">
+                <p>No scans yet. Start identifying animals!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==============================================
+             3. SCAN TAB (Camera / Viewfinder)
+             ============================================== -->
+        <div class="screen-view" id="scanScreen">
+          <!-- Viewfinder Frame -->
+          <div class="viewfinder-container" id="viewfinderContainer">
+            <video id="webcamVideo" autoplay playsinline muted></video>
+            <div class="image-preview-overlay" id="imagePreviewOverlay">
+              <img id="capturedImageElement" alt="Scanned animal preview">
+            </div>
+            
+            <!-- Scan Grid Overlay Lines -->
+            <div class="viewfinder-grid">
+              <div class="grid-line"></div>
+              <div class="grid-line"></div>
+              <div class="grid-line"></div>
+              <div class="grid-line"></div>
+            </div>
+            
+            <!-- Dynamic scanning bar -->
+            <div class="scanner-laser" id="scannerLaser"></div>
+            
+            <!-- Tap to Upload Box (visible when camera is off or loaded file) -->
+            <div class="upload-fallback-box" id="uploadFallbackBox">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <h3>Camera Viewfinder</h3>
+              <p>Grant camera access or tap below to upload an image</p>
+            </div>
+
+            <!-- Toast alert -->
+            <div class="scan-toast" id="scanToast">Success</div>
+          </div>
+
+          <!-- Scanner Controls -->
+          <div class="scanner-controls-panel">
+            <div class="model-select-pill">
+              <button class="model-pill-item active" id="pillModelMobile" data-model="wild_animal">WildAI (Fast)</button>
+              <button class="model-pill-item" id="pillModelResnet" data-model="resnet50">ResNet50 (Detailed)</button>
+            </div>
+
+            <div class="scanner-action-buttons">
+              <!-- Gallery Select -->
+              <button class="control-btn" id="btnGallery" title="Upload from Gallery">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+              </button>
+
+              <!-- Main Capture Trigger -->
+              <button class="capture-trigger-outer" id="btnCaptureOuter">
+                <div class="capture-trigger-inner" id="btnCaptureInner"></div>
+              </button>
+
+              <!-- Camera On/Off Toggle -->
+              <button class="control-btn" id="btnToggleCamera" title="Toggle Webcam">
+                <svg id="cameraOnIcon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                <svg id="cameraOffIcon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                  <path d="M1 1l22 22M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34"></path>
+                  <path d="M9.34 9.34A4 4 0 0 0 14.66 14.66"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <p class="scan-instructions-text">Align animal in frame and press capture, or import files.</p>
+          </div>
+        </div>
+
+        <!-- ==============================================
+             4. HISTORY TAB
+             ============================================== -->
+        <div class="screen-view" id="historyScreen">
+          <div class="screen-header">
+            <h2>Discovery History</h2>
+            <button class="clear-btn" id="btnClearHistory" title="Clear all history">Clear All</button>
+          </div>
+
+          <div class="history-scroll-container" id="historyContainer">
+            <!-- Dynamically populated list -->
+            <div class="empty-state">
+              <div class="empty-icon">📂</div>
+              <p>Your scan history is empty.</p>
+              <p class="sub-text">Scanned animals will be saved here automatically.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==============================================
+             5. SETTINGS TAB
+             ============================================== -->
+        <div class="screen-view" id="settingsScreen">
+          <div class="screen-header">
+            <h2>Settings</h2>
+          </div>
+
+          <div class="settings-scroll-container">
+            <!-- Server Connection Section -->
+            <div class="settings-group">
+              <div class="settings-group-title">Backend Connection</div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <h3>Server Address</h3>
+                  <p>Inference API Host</p>
+                </div>
+                <div class="row-value select-text">http://localhost:8000</div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <h3>Connection Status</h3>
+                  <p id="serverStatusInfo">Checking connection...</p>
+                </div>
+                <div class="row-value">
+                  <span class="badge" id="settingsStatusBadge">Offline</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Model Selection Section -->
+            <div class="settings-group">
+              <div class="settings-group-title">Classification Engine</div>
+              
+              <div class="model-selection-card active" data-engine="wild_animal" id="settingsCardMobile">
+                <div class="model-card-header">
+                  <h3>Wild Animal Model</h3>
+                  <span class="badge badge-accent">Recommended</span>
+                </div>
+                <p class="model-card-desc">Architecture: MobileNetV2 (~9.4 MB). Optimized for speed and low CPU utilization. Very fast responses.</p>
+                <div class="model-card-metrics">
+                  <span>Latency: ~15-30ms</span>
+                  <span>Accuracy: High</span>
+                </div>
+              </div>
+
+              <div class="model-selection-card" data-engine="resnet50" id="settingsCardResnet">
+                <div class="model-card-header">
+                  <h3>ResNet50 Animal Model</h3>
+                  <span class="badge badge-neutral">Detailed</span>
+                </div>
+                <p class="model-card-desc">Architecture: ResNet50 (~94.8 MB). Full deep model with large layer representations. Heavy footprint.</p>
+                <div class="model-card-metrics">
+                  <span>Latency: ~70-130ms</span>
+                  <span>Accuracy: Very High</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preferences Group -->
+            <div class="settings-group">
+              <div class="settings-group-title">App Preferences</div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <h3>Dark Theme</h3>
+                  <p>Toggle display interface color</p>
+                </div>
+                <div class="row-value">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="themeSwitch" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="row-label">
+                  <h3>Sound Effects</h3>
+                  <p>Play sound on positive classification</p>
+                </div>
+                <div class="row-value">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="soundSwitch" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="settings-group">
+              <div class="settings-group-title">About</div>
+              <div class="settings-row-text">
+                <p><strong>WildAI Mockup</strong> v1.0.0</p>
+                <p>Designed for iPhone UI testing. Connects to a local PyTorch server loaded with animal classification weights representing 64 distinct classes.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==============================================
+             6. DETAIL & RESULTS BOTTOM MODAL SHEET
+             ============================================== -->
+        <div class="details-bottom-sheet" id="detailsBottomSheet">
+          <div class="sheet-drag-handle" id="sheetDragHandle"></div>
+          
+          <div class="sheet-header">
+            <div class="sheet-title-col">
+              <h2 id="resultAnimalName">Cheetah</h2>
+              <p id="resultScientificName">Acinonyx jubatus</p>
+            </div>
+            <button class="sheet-close-btn" id="btnExitResults" title="Close results">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="sheet-scroll-content">
+            <!-- Confidence Match Card -->
+            <div class="result-confidence-card">
+              <div class="confidence-circle-wrap">
+                <!-- SVG circular progress bar -->
+                <svg class="confidence-svg" viewBox="0 0 36 36">
+                  <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path class="circle-progress" id="resultConfidenceCircle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="confidence-text-label" id="resultConfidencePercent">0%</div>
+              </div>
+              <div class="confidence-meta-info">
+                <h3>Match Confidence</h3>
+                <p id="resultModelDetails">Classified via Wild Animal Model</p>
+                <p id="resultLatencyDetails">Inference latency: 12ms</p>
+              </div>
+            </div>
+
+            <!-- Tab Selector for Facts vs Model Comparison -->
+            <div class="results-tab-bar">
+              <button class="result-tab active" id="tabFactsBtn">Animal Facts</button>
+              <button class="result-tab" id="tabCompareBtn">Compare Models</button>
+            </div>
+
+            <!-- Details Content: Facts -->
+            <div class="tab-pane active" id="paneFacts">
+              <div class="info-metrics-row">
+                <div class="info-metric-box">
+                  <span class="metric-icon">🗺️</span>
+                  <div class="metric-content">
+                    <p>Habitat</p>
+                    <strong id="factHabitat">Savannahs</strong>
+                  </div>
+                </div>
+                <div class="info-metric-box">
+                  <span class="metric-icon">🍖</span>
+                  <div class="metric-content">
+                    <p>Diet</p>
+                    <strong id="factDiet">Carnivore</strong>
+                  </div>
+                </div>
+                <div class="info-metric-box">
+                  <span class="metric-icon">⚠️</span>
+                  <div class="metric-content">
+                    <p>Status</p>
+                    <strong id="factStatus">Vulnerable</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="facts-description-box">
+                <h3>Description</h3>
+                <p id="factDescription">The cheetah is a large cat native to Africa and central Iran. It is the fastest land animal, capable of running at 50 to 70 mph...</p>
+              </div>
+
+              <div class="facts-predictions-list-box">
+                <h3>Top Predictions</h3>
+                <div class="predictions-list" id="resultPredictionsList">
+                  <!-- Dynamically populated progress bars -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Details Content: Compare Models -->
+            <div class="tab-pane" id="paneCompare">
+              <p class="compare-intro-text">Analyze predictions and performance between both models side-by-side for this image.</p>
+              
+              <div class="comparison-row">
+                <!-- Left: MobileNetV2 -->
+                <div class="compare-column" id="compareColMobile">
+                  <div class="col-header">
+                    <h4>WildAI Model</h4>
+                    <span class="badge badge-accent">MobileNetV2</span>
+                  </div>
+                  <div class="col-stat">
+                    <div class="stat-num" id="compareLatencyMobile">--ms</div>
+                    <div class="stat-label">Latency</div>
+                  </div>
+                  <div class="col-list-title">Top Predictions</div>
+                  <div class="compare-preds-list" id="comparePredsMobile">
+                    <!-- Dynamically populated -->
+                  </div>
+                </div>
+
+                <!-- Right: ResNet50 -->
+                <div class="compare-column" id="compareColResnet">
+                  <div class="col-header">
+                    <h4>Animal Model</h4>
+                    <span class="badge badge-neutral">ResNet50</span>
+                  </div>
+                  <div class="col-stat">
+                    <div class="stat-num" id="compareLatencyResnet">--ms</div>
+                    <div class="stat-label">Latency</div>
+                  </div>
+                  <div class="col-list-title">Top Predictions</div>
+                  <div class="compare-preds-list" id="comparePredsResnet">
+                    <!-- Dynamically populated -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="comparison-verdict-box" id="comparisonVerdictBox">
+                <h3>Inference Analysis</h3>
+                <p id="comparisonVerdictText">Perform a scan to run the comparative diagnostic.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==============================================
+             BOTTOM NAVIGATION BAR
+             ============================================== -->
+        <div class="iphone-nav-bar" id="appNavbar">
+          
+          <button class="nav-item active" data-tab="home" id="navHome">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span>Home</span>
+          </button>
+          
+          <button class="nav-item" data-tab="scan" id="navScan">
+            <div class="nav-scan-circle">
+              <svg class="nav-icon-scan" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </div>
+            <span style="margin-top: 18px;">Scan</span>
+          </button>
+          
+          <button class="nav-item" data-tab="history" id="navHistory">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>History</span>
+          </button>
+          
+          <button class="nav-item" data-tab="settings" id="navSettings">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Settings</span>
+          </button>
+          
+        </div>
+
+        <!-- iPhone Home Indicator Bar -->
+        <div class="iphone-home-indicator" id="homeIndicator"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio feedback effects -->
+  <audio id="soundScanSuccess" src="data:audio/wav;base64,UklGRjQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="></audio>
+
+  <!-- JS Link -->
+  <script src="app.js"></script>
+</body>
+</html>
