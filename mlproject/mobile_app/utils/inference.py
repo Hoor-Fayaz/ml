@@ -1,23 +1,22 @@
 import torch
 from PIL import Image
-from torchvision import transforms
 import os
 import sys
+
 # Ensure project root is in sys.path for absolute imports
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-from utils.config import get_threshold
-from animal_db import ANIMAL_CLASSES
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.append(PROJECT_ROOT)
+
+from config import get_threshold
+from model_utils import format_class_name, inference_transform, load_class_names
 
 # Load TorchScript model (relative to this file)
-MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'model', 'wild_animal_ts.pt'))
+MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'model', 'resnet50_animal64_ts.pt'))
 model = torch.jit.load(MODEL_PATH, map_location='cpu')
 model.eval()
 
-preprocess = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor()
-])
+class_names = load_class_names()
+preprocess = inference_transform()
 
 def predict(image_path: str):
     """Run inference on an image file and apply confidence threshold.
@@ -34,5 +33,6 @@ def predict(image_path: str):
     if confidence < threshold:
         return {"class": "Uncertain", "confidence": confidence}
     idx = top_idx.item()
-    class_name = ANIMAL_CLASSES[idx] if idx < len(ANIMAL_CLASSES) else "Unknown"
+    raw_class_name = class_names[idx] if idx < len(class_names) else "unknown"
+    class_name = format_class_name(raw_class_name)
     return {"class": class_name, "confidence": confidence}

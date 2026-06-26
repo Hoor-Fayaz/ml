@@ -5,6 +5,7 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
+from model_utils import IMAGENET_MEAN, IMAGENET_STD, MODEL_PATH
 
 # List of the 64 animal classes
 ANIMAL_CLASSES = [
@@ -19,7 +20,12 @@ ANIMAL_CLASSES = [
 ]
 
 # Set device
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+elif torch.backends.mps.is_available():
+    device = torch.device("mps")
+else:
+    device = torch.device("cpu")
 print(f"Using device: {device}")
 
 # Define training data paths and targets
@@ -74,20 +80,22 @@ train_transform = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomRotation(15),
     transforms.ColorJitter(brightness=0.15, contrast=0.15, saturation=0.15),
-    transforms.ToTensor()
+    transforms.ToTensor(),
+    transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
 ])
 
 val_transform = transforms.Compose([
     transforms.Resize(256),
     transforms.CenterCrop(224),
-    transforms.ToTensor()
+    transforms.ToTensor(),
+    transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
 ])
 
 train_dataset = AnimalDataset(existing_samples, train_transform)
 train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
 
 # Load Model
-model_path = '/Users/Junaid/Desktop/mlproject/wild_animal_model-2.pth'
+model_path = MODEL_PATH
 model = models.mobilenet_v2()
 model.classifier[1] = nn.Linear(1280, 64)
 model.load_state_dict(torch.load(model_path, map_location='cpu'))

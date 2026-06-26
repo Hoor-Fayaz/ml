@@ -8,12 +8,16 @@ from io import BytesIO
 from PIL import Image
 
 import torch
-import torchvision.models as models
-import torch.nn as nn
-import torchvision.transforms as transforms
 
-# Import classes and facts
-from animal_db import ANIMAL_CLASSES, ANIMAL_FACTS
+# Import facts
+from animal_db import ANIMAL_FACTS
+from model_utils import (
+    MODEL_PATH,
+    format_class_name,
+    inference_batch,
+    inference_transform,
+    load_model_bundle,
+)
 
 PORT = 8001
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
@@ -22,26 +26,24 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 print("Loading PyTorch models into memory...")
 device = torch.device("cpu")
 
-# Load MobileNetV2 Wild Animal Model
-mobilenet_model = None
+# Load ResNet50 Wild Animal Model
+animal_model = None
+class_names = []
+loaded_model_name = "resnet50"
 try:
-    print("-> Loading wild_animal_model-2.pth (9MB)...")
+    print(f"-> Loading {MODEL_PATH}...")
     t0 = time.time()
-    mobilenet_model = models.mobilenet_v2()
-    mobilenet_model.classifier[1] = nn.Linear(1280, 64)
-    mobilenet_model.load_state_dict(torch.load('wild_animal_model-2.pth', map_location=device))
-    mobilenet_model.to(device)
-    mobilenet_model.eval()
-    print(f"MobileNetV2 loaded successfully in {time.time() - t0:.2f} seconds!")
+    model_bundle = load_model_bundle(MODEL_PATH, device)
+    animal_model = model_bundle["model"]
+    class_names = model_bundle["class_names"]
+    loaded_model_name = model_bundle["model_name"]
+    print(f"{loaded_model_name} loaded successfully in {time.time() - t0:.2f} seconds!")
+    print(f"Loaded {len(class_names)} class labels from checkpoint.")
 except Exception as e:
-    print(f"Error loading MobileNetV2: {e}")
+    print(f"Error loading animal model: {e}")
 
 # Preprocessing transforms
-preprocess = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor()
-])
+preprocess = inference_transform()
 
 def run_inference(model, image):
     """Run inference on the model and return top 5 classes and scores"""
@@ -49,12 +51,11 @@ def run_inference(model, image):
         raise ValueError("Model is not loaded.")
     
     t_start = time.time()
-    # Preprocess image
-    img_tensor = preprocess(image).unsqueeze(0).to(device)
+    img_batch = inference_batch(image).to(device)
     
     with torch.no_grad():
-        outputs = model(img_tensor)
-        probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
+        outputs = model(img_batch)
+        probabilities = torch.nn.functional.softmax(outputs, dim=1).mean(dim=0)
         
     latency_ms = (time.time() - t_start) * 1000
     
@@ -66,9 +67,11 @@ def run_inference(model, image):
         idx = top5_catid[i].item()
         prob = top5_prob[i].item()
         # Bound safety
-        class_name = ANIMAL_CLASSES[idx] if idx < len(ANIMAL_CLASSES) else f"Unknown ({idx})"
+        raw_class_name = class_names[idx] if idx < len(class_names) else f"unknown ({idx})"
+        class_name = format_class_name(raw_class_name)
         predictions.append({
             "class": class_name,
+            "raw_class": raw_class_name,
             "confidence": prob,
             "index": idx
         })
@@ -159,12 +162,12 @@ class WildAIRequestHandler(http.server.BaseHTTPRequestHandler):
                 image_bytes = base64.b64decode(image_data)
                 image = Image.open(BytesIO(image_bytes)).convert("RGB")
 
-                # Ensure MobileNetV2 model is loaded
-                if mobilenet_model is None:
-                    self.send_error_response(500, "MobileNetV2 model not loaded.")
+                # Ensure model is loaded
+                if animal_model is None:
+                    self.send_error_response(500, "Animal classifier model not loaded.")
                     return
 
-                predictions, latency_ms = run_inference(mobilenet_model, image)
+                predictions, latency_ms = run_inference(animal_model, image)
                 top_class = predictions[0]['class']
                 facts = ANIMAL_FACTS.get(top_class, {
                     "scientific_name": "N/A",
@@ -176,8 +179,8 @@ class WildAIRequestHandler(http.server.BaseHTTPRequestHandler):
 
                 response_data = {
                     "success": True,
-                    "model": "wild_animal",
-                    "model_name": "Wild Animal Model (MobileNetV2)",
+                    "model": loaded_model_name,
+                    "model_name": "ResNet50 Animal Model",
                     "latency_ms": latency_ms,
                     "predictions": predictions,
                     "facts": facts

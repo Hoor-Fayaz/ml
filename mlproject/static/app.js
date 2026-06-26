@@ -223,7 +223,7 @@ function loadLocalStorage() {
         confidence: 0.942,
         timestamp: Date.now() - 3600000 * 2, // 2 hours ago
         image: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&width=300&auto=format&fit=crop',
-        model: 'wild_animal',
+        model: 'resnet50',
         predictions: [
           { class: 'Fox', confidence: 0.942 },
           { class: 'Wolf', confidence: 0.038 },
@@ -240,7 +240,7 @@ function loadLocalStorage() {
         confidence: 0.978,
         timestamp: Date.now() - 3600000 * 5, // 5 hours ago
         image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?q=80&width=300&auto=format&fit=crop',
-        model: 'wild_animal',
+        model: 'resnet50',
         predictions: [
           { class: 'Eagle', confidence: 0.978 },
           { class: 'Falcon', confidence: 0.015 },
@@ -257,7 +257,7 @@ function loadLocalStorage() {
         confidence: 0.991,
         timestamp: Date.now() - 3600000 * 24, // 24 hours ago
         image: 'https://images.unsplash.com/photo-1508817628294-5a453fa0b8fb?q=80&width=300&auto=format&fit=crop',
-        model: 'wild_animal',
+        model: 'resnet50',
         predictions: [
           { class: 'Panda', confidence: 0.991 },
           { class: 'Bear', confidence: 0.008 },
@@ -735,7 +735,7 @@ function runSingleClassificationRequest() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       image: state.capturedImageBase64,
-      model: 'wild_animal'
+        model: 'resnet50'
     })
   })
   .then(res => res.json())
@@ -757,7 +757,7 @@ function runSingleClassificationRequest() {
           confidence: data.predictions[0].confidence,
           timestamp: Date.now(),
           image: compressedBase64,
-          model: 'wild_animal'
+          model: 'resnet50'
         };
         
         state.history.unshift(newDiscovery);
@@ -765,7 +765,7 @@ function runSingleClassificationRequest() {
       });
       
       // Render details modal
-      renderDetailsModal(data.predictions[0].class, data.facts, data.predictions, data.latency_ms, 'WildAI');
+      renderDetailsModal(data.predictions[0].class, data.facts, data.predictions, data.latency_ms, data.model_name || 'ResNet50');
       
       // Open modal bottom sheet
       openDetailsSheet();
@@ -880,7 +880,7 @@ function showDetailsDirect(item) {
   ];
   
   const latency = item.latency_ms || 0.0;
-  const modelStr = item.model === 'wild_animal' ? 'Wild Animal Model' : 'ResNet50 Model';
+  const modelStr = 'ResNet50 Animal Model';
   
   // Set image preview in scanner tab
   DOM.capturedImageElement.src = item.image;
@@ -957,23 +957,13 @@ function setupPreferences() {
 }
 
 function updateModelPill(model) {
-  if (model === 'wild_animal') {
-    DOM.pillModelMobile.classList.add('active');
-    DOM.pillModelResnet.classList.remove('active');
-  } else {
-    DOM.pillModelResnet.classList.add('active');
-    DOM.pillModelMobile.classList.remove('active');
-  }
+  DOM.pillModelMobile.classList.add('active');
+  DOM.pillModelResnet.classList.remove('active');
 }
 
 function updateModelSettingsCard(model) {
-  if (model === 'wild_animal') {
-    DOM.settingsCardMobile.classList.add('active');
-    DOM.settingsCardResnet.classList.remove('active');
-  } else {
-    DOM.settingsCardResnet.classList.add('active');
-    DOM.settingsCardMobile.classList.remove('active');
-  }
+  DOM.settingsCardMobile.classList.add('active');
+  DOM.settingsCardResnet.classList.remove('active');
 }
 
 // ==========================================================================

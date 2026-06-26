@@ -91,7 +91,7 @@
                 <div class="feature-icon">⚡</div>
                 <div class="feature-text">
                   <h3>Dual Model Engine</h3>
-                  <p>Compare ResNet50 and MobileNetV2 models side-by-side for accuracy and latency.</p>
+                  <p>Classify wildlife using the newly trained ResNet50 animal model.</p>
                 </div>
               </div>
             </div>
@@ -224,8 +224,8 @@
           <!-- Scanner Controls -->
           <div class="scanner-controls-panel">
             <div class="model-select-pill">
-              <button class="model-pill-item active" id="pillModelMobile" data-model="wild_animal">WildAI (Fast)</button>
-              <button class="model-pill-item" id="pillModelResnet" data-model="resnet50">ResNet50 (Detailed)</button>
+              <button class="model-pill-item active" id="pillModelMobile" data-model="resnet50">ResNet50</button>
+              <button class="model-pill-item" id="pillModelResnet" data-model="resnet50">Animal64</button>
             </div>
 
             <div class="scanner-action-buttons">
@@ -297,7 +297,7 @@
                   <h3>Server Address</h3>
                   <p>Inference API Host</p>
                 </div>
-                <div class="row-value select-text">http://localhost:8000</div>
+                <div class="row-value select-text">http://localhost:8001</div>
               </div>
               <div class="settings-row">
                 <div class="row-label">
@@ -314,14 +314,14 @@
             <div class="settings-group">
               <div class="settings-group-title">Classification Engine</div>
               
-              <div class="model-selection-card active" data-engine="wild_animal" id="settingsCardMobile">
+              <div class="model-selection-card active" data-engine="resnet50" id="settingsCardMobile">
                 <div class="model-card-header">
-                  <h3>Wild Animal Model</h3>
+                  <h3>ResNet50 Animal Model</h3>
                   <span class="badge badge-accent">Recommended</span>
                 </div>
-                <p class="model-card-desc">Architecture: MobileNetV2 (~9.4 MB). Optimized for speed and low CPU utilization. Very fast responses.</p>
+                <p class="model-card-desc">Architecture: ResNet50 trained on the 64-class animal dataset. Uses saved checkpoint labels for accurate class mapping.</p>
                 <div class="model-card-metrics">
-                  <span>Latency: ~15-30ms</span>
+                  <span>Latency: CPU dependent</span>
                   <span>Accuracy: High</span>
                 </div>
               </div>
@@ -466,11 +466,11 @@
               <p class="compare-intro-text">Analyze predictions and performance between both models side-by-side for this image.</p>
               
               <div class="comparison-row">
-                <!-- Left: MobileNetV2 -->
+                <!-- Left: Active model -->
                 <div class="compare-column" id="compareColMobile">
                   <div class="col-header">
                     <h4>WildAI Model</h4>
-                    <span class="badge badge-accent">MobileNetV2</span>
+                    <span class="badge badge-accent">ResNet50</span>
                   </div>
                   <div class="col-stat">
                     <div class="stat-num" id="compareLatencyMobile">--ms</div>
